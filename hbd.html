@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Happy Birthday </title>
+
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Gloock&display=swap" rel="stylesheet">
+
+<style>
+    body {
+        margin: 0;
+        overflow-y: auto;
+        background: #000; /* black background */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        font-family: Arial, sans-serif;
+        color: white;
+    }
+
+    /* CARD */
+    .card-container {
+        position: relative;
+        z-index: 10;
+        background: rgba(255, 255, 255, 0.12);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 20px;
+        width: 90%;
+        max-width: 450px;
+        text-align: center;
+        box-shadow: 0 0 20px rgba(255,255,255,0.2);
+        animation: fadeIn 1.5s ease-out;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        overflow: hidden;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: scale(0.9); }
+        to { opacity: 1; transform: scale(1); }
+    }
+
+    h1 {
+        font-family: 'Pacifico', cursive;
+        color: #ff5da2;
+        font-size: 2em;
+        text-shadow: 0 0 10px #ff5da2;
+        margin-bottom: 10px;
+    }
+
+    #dateTime {
+        font-family: 'Gloock', serif;
+        font-size: 1.2em;
+        color: #ffd700;
+        margin-bottom: 15px;
+    }
+
+    .hbd-button, #musicBtn {
+        width: 90%;
+        max-width: 300px;
+        padding: 12px;
+        border: none;
+        border-radius: 30px;
+        font-size: 1.1em;
+        cursor: pointer;
+        margin-top: 10px;
+        transition: 0.3s;
+    }
+
+    .hbd-button {
+        background: #ffca28;
+        color: black;
+    }
+
+    .hbd-button:hover {
+        background: #ffb300;
+    }
+
+    #musicBtn {
+        background: #e84393;
+        color: white;
+        display: none;
+    }
+
+    .message {
+        margin-top: 15px;
+        background: rgba(255,255,255,0.1);
+        padding: 15px;
+        border-radius: 10px;
+        display: none;
+        animation: fadeInMsg 1.2s ease-out;
+        width: 100%;
+        text-align: center;
+    }
+
+    @keyframes fadeInMsg {
+        from {opacity: 0; transform: translateY(10px);}
+        to {opacity: 1; transform: translateY(0);}
+    }
+
+    .sis-photo {
+        width: 100%;
+        max-width: 350px;
+        height: auto;
+        border-radius: 15px;
+        margin-top: 15px;
+        box-shadow: 0 0 15px rgba(255, 255, 255, 0.507);
+    }
+
+    canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 0;
+    }
+
+    @media (max-width: 480px) {
+        h1 { font-size: 1.8em; }
+        #dateTime { font-size: 1em; }
+        .hbd-button, #musicBtn { font-size: 1em; padding: 10px; }
+        .sis-photo { max-width: 90%; height: auto; }
+    }
+</style>
+</head>
+<body>
+
+<canvas id="fireworksCanvas"></canvas>
+<canvas id="blueFlowCanvas"></canvas> <!-- Blue flowing effect -->
+
+<div class="card-container">
+    <h1>Some Thing Interesting</h1>
+    <div id="dateTime"></div>
+    <button id="surpriseButton" class="hbd-button" onclick="revealMessage()">Click Here</button>
+    <button id="musicBtn" onclick="toggleMusic()">⏸ Stop Music</button>
+    <div id="surpriseMessage" class="message">
+        <h2>শুভ জন্মদিন 🎂</h2>
+        <img src="YOUR_IMAGE_LINK_HERE.jpg" class="sis-photo" alt="Sister Photo">
+    </div>
+</div>
+
+<audio id="bgMusic" loop>
+    <source src="Nele_nele_ambar.opus" type="audio/ogg">
+</audio>
+
+<script>
+/* UPDATE DATE & TIME */
+function updateDateTime() {
+    const now = new Date();
+    const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    
+    const day = days[now.getDay()];
+    const month = months[now.getMonth()];
+    const date = now.getDate();
+    const year = now.getFullYear();
+    
+    const hours = String(now.getHours()).padStart(2,'0');
+    const minutes = String(now.getMinutes()).padStart(2,'0');
+    const seconds = String(now.getSeconds()).padStart(2,'0');
+    
+    document.getElementById('dateTime').textContent = `${day}, ${date} ${month} ${year} - ${hours}:${minutes}:${seconds}`;
+}
+setInterval(updateDateTime, 1000);
+updateDateTime();
+
+/* BUTTONS */
+function revealMessage() {
+    document.getElementById("surpriseMessage").style.display = "block";
+    document.getElementById("surpriseButton").style.display = "none";
+    document.getElementById("musicBtn").style.display = "block";
+    document.getElementById("bgMusic").play();
+}
+function toggleMusic() {
+    const music = document.getElementById("bgMusic");
+    const btn = document.getElementById("musicBtn");
+    if (music.paused) {
+        music.play();
+        btn.textContent = "⏸ Stop Music";
+    } else {
+        music.pause();
+        btn.textContent = "🎵 Play Music";
+    }
+}
+
+/* FIREWORKS EFFECT */
+const canvas = document.getElementById("fireworksCanvas");
+const ctx = canvas.getContext("2d");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+let fireworks = [];
+function createFirework() {
+    const x = Math.random() * canvas.width;
+    const y = Math.random() * canvas.height * 0.5;
+    for (let i = 0; i < 30; i++) {
+        fireworks.push({
+            x, y,
+            angle: (Math.PI*2*i)/30,
+            radius: 2,
+            speed: Math.random()*3+2,
+            alpha:1,
+            color:`hsl(${Math.random()*360},100%,60%)`
+        });
+    }
+}
+function animate() {
+    ctx.fillStyle = "rgba(0,0,0,0.2)";
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+    fireworks.forEach((p,i)=>{
+        const vx=Math.cos(p.angle)*p.speed;
+        const vy=Math.sin(p.angle)*p.speed;
+        p.x+=vx; p.y+=vy;
+        p.alpha-=0.02;
+        ctx.globalAlpha=p.alpha;
+        ctx.fillStyle=p.color;
+        ctx.beginPath();
+        ctx.arc(p.x,p.y,p.radius,0,Math.PI*2);
+        ctx.fill();
+        if(p.alpha<=0) fireworks.splice(i,1);
+    });
+    requestAnimationFrame(animate);
+}
+setInterval(createFirework,600);
+animate();
+
+/* BLUE FLOWING PARTICLES */
+const blueCanvas = document.getElementById("blueFlowCanvas");
+const bctx = blueCanvas.getContext("2d");
+blueCanvas.width = window.innerWidth;
+blueCanvas.height = window.innerHeight;
+let particles = [];
+function createParticle() {
+    particles.push({
+        x: Math.random()*blueCanvas.width,
+        y: Math.random()*blueCanvas.height,
+        radius: Math.random()*3+2,
+        speedX: (Math.random()-0.5)*1,
+        speedY: (Math.random()-0.5)*1,
+        alpha: Math.random()*0.5+0.3
+    });
+}
+function animateParticles() {
+    bctx.clearRect(0,0,blueCanvas.width,blueCanvas.height);
+    particles.forEach(p=>{
+        p.x+=p.speedX;
+        p.y+=p.speedY;
+        if(p.x<0)p.x=blueCanvas.width;
+        if(p.x>blueCanvas.width)p.x=0;
+        if(p.y<0)p.y=blueCanvas.height;
+        if(p.y>blueCanvas.height)p.y=0;
+        bctx.fillStyle=`rgba(0,150,255,${p.alpha})`;
+        bctx.beginPath();
+        bctx.arc(p.x,p.y,p.radius,0,Math.PI*2);
+        bctx.fill();
+    });
+    requestAnimationFrame(animateParticles);
+}
+for(let i=0;i<100;i++) createParticle();
+animateParticles();
+
+/* RESIZE HANDLER */
+window.onresize = () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    blueCanvas.width = window.innerWidth;
+    blueCanvas.height = window.innerHeight;
+};
+</script>
+
+</body>
+</html>
